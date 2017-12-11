@@ -11,6 +11,7 @@ Welcome to the Solr Mongo Importer project. This project provides MongoDb suppor
 
 * MongoDataSource - Provides a MongoDb datasource
     * database (**required**) - The name of the data base you want to connect to
+    * databaseAuth (*optional*) - The name of the data base to validate the user against (default: database)
     * host     (*optional* - default: localhost)
     * port     (*optional* - default: 27017)
     * username (*optional*)
@@ -26,7 +27,7 @@ Welcome to the Solr Mongo Importer project. This project provides MongoDb suppor
 ## Installation
 1. Firstly you will need a copy of the Solr Mongo Importer jar.
     ### Getting Solr Mongo Importer
-    1. [Download the latest JAR from github](https://github.com/james75/SolrMongoImporter/releases)
+    1. [Download the latest JAR from github](https://github.com/drodmun/SolrMongoImporter/releases)
     2. Build your own using the ant build script you will need the JDK installed as well as Ant and Ivy
 2. You will also need the [Mongo Java driver JAR]   (https://github.com/mongodb/mongo-java-driver/downloads)
 
@@ -43,7 +44,8 @@ Here is a sample data-config.xml showing the use of all components
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
 <dataConfig>
-     <dataSource name="MyMongo" type="MongoDataSource" database="Inventory" />
+     <dataSource name="MyMongo" type="MongoDataSource" host="localhost" port="27017"
+    			database="Inventory" databaseAuth="InventoryUsers" username="devusr" password="pass1234" />
      <document name="Products">
          <entity processor="MongoEntityProcessor"
                  query="{'Active':1}"
