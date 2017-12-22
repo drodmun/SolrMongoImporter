@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="src" path="src/main"/>
-	<classpathentry kind="lib" path="/opt/solr-5.2.1/contrib/dataimporthandler/lib/mongo-java-driver-3.5.0.jar" sourcepath="/home/drmunoz/.m2/repository/org/mongodb/mongo-java-driver/3.5.0/mongo-java-driver-3.5.0-sources.jar"/>
-	<classpathentry kind="lib" path="/home/drmunoz/.m2/repository/org/slf4j/slf4j-api/1.7.12/slf4j-api-1.7.12.jar"/>
-	<classpathentry kind="lib" path="/opt/solr-5.2.1/contrib/dataimporthandler/lib/solr-dataimporthandler-5.2.1.jar"/>
-	<classpathentry kind="output" path="bin"/>
-</classpath>
