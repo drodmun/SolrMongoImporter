@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.solr.core.CoreDescriptor;
+import org.apache.solr.core.SolrCore;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.slf4j.Logger;
@@ -47,6 +49,20 @@ public class MongoDataSource extends DataSource<Iterator<Map<String, Object>>> {
         String username = initProps.getProperty(USERNAME);
         String password = initProps.getProperty(PASSWORD);
 
+        SolrCore solrCore = context.getSolrCore();
+        if (solrCore != null) {
+            CoreDescriptor coreDescriptor = solrCore.getCoreDescriptor();
+            if (coreDescriptor != null) {
+                Properties userProperties = coreDescriptor.getPersistableUserProperties();
+                databaseName = getSubstitutedPropertyValue(userProperties, databaseName);
+                database_auth = getSubstitutedPropertyValue(userProperties, database_auth);
+                host = getSubstitutedPropertyValue(userProperties, host);
+                port = getSubstitutedPropertyValue(userProperties, port);
+                username = getSubstitutedPropertyValue(userProperties, username);
+                password = getSubstitutedPropertyValue(userProperties, password);
+            }
+        }
+
         if (databaseName == null) {
             throw new DataImportHandlerException(SEVERE, "Database must be supplied");
         } else if (database_auth == null) {
@@ -74,6 +90,21 @@ public class MongoDataSource extends DataSource<Iterator<Map<String, Object>>> {
 
     private boolean hasValue(String str) {
         return str != null && !str.isEmpty();
+    }
+
+    /**
+     * If the property is like ${xxxx}, it get the substituted value from properties object
+     * 
+     * @param properties
+     * @param propertyValue
+     * @return
+     */
+    private String getSubstitutedPropertyValue(Properties properties, String propertyValue) {
+        if (properties != null && hasValue(propertyValue) && propertyValue.startsWith("${") && propertyValue.endsWith("}")) {
+            return properties.getProperty(propertyValue.replace("${", "").replace("}", ""), propertyValue);
+        } else {
+            return propertyValue;
+        }
     }
 
     @Override
