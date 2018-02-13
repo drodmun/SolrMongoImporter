@@ -4,6 +4,7 @@ Welcome to the Solr Mongo Importer project. This project provides MongoDb suppor
 ## Features
 * Retrive data from a MongoDb collection
 * Authenticate using MongoDb authentication
+* Allows to use core.properties as conection params
 * Map Mongo fields to Solr fields
 * Delta import available
 
@@ -39,13 +40,17 @@ Welcome to the Solr Mongo Importer project. This project provides MongoDb suppor
     <lib path="../../dist/mongo.jar" />
 ```
 
-##Usage
+## Usage
 Here is a sample data-config.xml showing the use of all components
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
 <dataConfig>
      <dataSource name="MyMongo" type="MongoDataSource" host="localhost" port="27017"
     			database="Inventory" databaseAuth="InventoryUsers" username="devusr" password="pass1234" />
+     <!-- In case you want to use core.properties, reference them as variables
+     <dataSource name="mongodocs" type="MongoDataSource" host="${mongo.host}"
+            port="${mongo.port}" database="${mongo.database}" databaseAuth="${mongo.databaseAuth}" 
+            username="${mongo.username}" password="${mongo.password}" /> //-->
      <document name="Products">
          <entity processor="MongoEntityProcessor"
                  query="{'Active':1}"
