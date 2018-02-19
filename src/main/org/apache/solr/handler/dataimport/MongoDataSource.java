@@ -3,9 +3,11 @@ package org.apache.solr.handler.dataimport;
 import static org.apache.solr.handler.dataimport.DataImportHandlerException.SEVERE;
 import static org.apache.solr.handler.dataimport.DataImportHandlerException.wrapAndThrow;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -70,18 +72,27 @@ public class MongoDataSource extends DataSource<Iterator<Map<String, Object>>> {
         }
 
         try {
+            // Check for replica sets
+            String[] urls = host.split(",");
+            if (urls != null) {
+                MongoClient mongo;
 
-            MongoClient mongo;
+                List<ServerAddress> addr = new ArrayList<>();
 
-            if (hasValue(username) && hasValue(password) && hasValue(database_auth)) {
-                MongoCredential credential = MongoCredential.createCredential(username, database_auth, password.toCharArray());
-                mongo = new MongoClient(new ServerAddress(host, Integer.parseInt(port)), Arrays.asList(credential));
-            } else {
-                mongo = new MongoClient(host, Integer.parseInt(port));
+                for (String urlTmp : urls) {
+                    addr.add(new ServerAddress(urlTmp, Integer.parseInt(port)));
+                }
+
+                if (hasValue(username) && hasValue(password) && hasValue(database_auth)) {
+                    MongoCredential credential = MongoCredential.createCredential(username, database_auth, password.toCharArray());
+                    mongo = new MongoClient(addr, Arrays.asList(credential));
+                } else {
+                    mongo = new MongoClient(addr);
+                }
+
+                this.mongoClient = mongo;
+                this.mongoDb = mongo.getDatabase(databaseName);
             }
-
-            this.mongoClient = mongo;
-            this.mongoDb = mongo.getDatabase(databaseName);
 
         } catch (Exception e) {
             throw new DataImportHandlerException(SEVERE, e);
