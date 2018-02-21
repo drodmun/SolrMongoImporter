@@ -14,6 +14,10 @@ import java.util.Set;
 
 import org.apache.solr.core.CoreDescriptor;
 import org.apache.solr.core.SolrCore;
+import org.apache.solr.handler.dataimport.Context;
+import org.apache.solr.handler.dataimport.DataImportHandlerException;
+import org.apache.solr.handler.dataimport.DataSource;
+import org.apache.solr.handler.dataimport.TemplateTransformer;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.slf4j.Logger;
@@ -75,6 +79,7 @@ public class MongoDataSource extends DataSource<Iterator<Map<String, Object>>> {
             // Check for replica sets
             String[] urls = host.split(",");
             if (urls != null) {
+                LOG.info(urls.toString());
                 MongoClient mongo;
 
                 List<ServerAddress> addr = new ArrayList<>();
@@ -84,14 +89,23 @@ public class MongoDataSource extends DataSource<Iterator<Map<String, Object>>> {
                 }
 
                 if (hasValue(username) && hasValue(password) && hasValue(database_auth)) {
+                    LOG.info("Acceding WITH credentials");
                     MongoCredential credential = MongoCredential.createCredential(username, database_auth, password.toCharArray());
                     mongo = new MongoClient(addr, Arrays.asList(credential));
                 } else {
+                    LOG.info("Acceding WITHOUT credentials");
                     mongo = new MongoClient(addr);
                 }
 
                 this.mongoClient = mongo;
                 this.mongoDb = mongo.getDatabase(databaseName);
+
+                if (mongoClient == null || mongoDb == null) {
+                    throw new DataImportHandlerException(SEVERE,
+                            "Connection not successful, client:" + mongoClient + ", DB: " + mongoDb);
+                }
+            } else {
+                throw new DataImportHandlerException(SEVERE, "Hosts must be supplied");
             }
 
         } catch (Exception e) {
